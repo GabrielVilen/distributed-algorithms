@@ -6,8 +6,8 @@ java -jar $tn_path \
 --config myconfig.txt \
 --compile
 
-#javac -cp ../teachnet.jar MyAlgorithm.java
-#java -cp .:../teachnet.jar teachnet/view/TeachnetFrame
+javac -cp ../teachnet.jar MyAlgorithm.java
+java -cp .:../teachnet.jar teachnet/view/TeachnetFrame
 
 # Windows Users use 
 # java -cp .;..\teachnet.jar teachnet/view/TeachnetFrame

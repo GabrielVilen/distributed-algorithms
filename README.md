@@ -1,6 +1,11 @@
 # Distributed_Algorithms
 
-Exercise 1.3: Distribution of Information
+# HOW TO RUN
+Run run.sh script from your directory - by hand exemplary or cd to this directory and ./run.sh
+
+If you are on Windows - modify your run.sh file!!
+
+# Exercise 1.3: Distribution of Information
 
 i. Implement the Flooding algorithm with acknowledgments using the simulation
   framework teachnet (provided at the ISIS course website). After finishing the
