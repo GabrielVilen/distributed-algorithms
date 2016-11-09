@@ -1,0 +1,216 @@
+# configuration file for a simulation run in teachnet
+
+
+
+# graph section, mandatory, at most ONCE per file
+# ===============================================
+# describes a graph topology consisting of nodes and edges
+
+[graph]
+# size of graph (number of nodes)
+
+6
+
+# connections between nodes
+# (node ids start at zero)
+
+# simple edge between nodes 0 and 1
+# a new interface (first one is zero) is created for each node
+
+0-1
+
+# broacast edge betwenn nodes 0, 1 and 2
+# a new interface (first one is zero) is created for each node
+# (now nodes 0 and 1 have two interfaces, node 2 has one)
+
+0-1-2
+
+# simple edge between nodes 2 and 3 with explicit interfaces
+# (gaps between interfaces are filled with disconnected interfaces)
+# node 2 now has two interfaces, node 3 has one
+
+2,1-3,0
+
+# broadcast edge between nodes 3, 4 and 5 with explicit interfaces
+# node 3 and 4 now have two interfaces (interface 0 of node 4 is
+# disconnected) and node 5 has one
+
+3,1-4,1-5,0
+
+
+# another example of a graph (remember: only one graph section per file)
+# results in a triangle with one extra node connected to one corner
+
+[graph]
+
+4
+
+0-1
+0-2
+1-2
+2-3
+
+
+# another example of a graph (remember: only one graph section per file)
+# results in two broadcast networks connect via node 3
+# (node 3 will have two interfaces)
+
+[graph]
+
+7
+
+0-1-2-3
+3-4-5-6
+
+
+
+# random graph section, mandatory, at most ONCE per file
+# ======================================================
+# can be used INSTEAD of the graph section
+# (only ONE graph XOR random graph section per file)
+
+[graph.random]
+
+# name of graph generator class
+# (only two implementations exist currently, another one is shown below)
+
+teachnet.util.RandomConnectedGraphGenerator
+
+# generator parameters in the form <name>=<class name>:<value>
+# supported classes are: java.lang.String, java.lang.Long, 
+#   java.lang.Integer, java.lang.Float, java.lang.Double
+
+# number of nodes in graph
+n=java.lang.Integer:10
+# number of edges in graph (must be >= n - 1)
+e=java.lang.Integer:15
+
+
+
+# random graph section, mandatory, at most ONCE per file
+# ======================================================
+# can be used INSTEAD of the graph section
+# (only ONE graph XOR random graph section per file)
+
+[graph.random]
+
+# name of graph generator class
+
+teachnet.util.RandomTreeGraphGenerator
+
+# generator parameters in the form <name>=<class name>:<value>
+# supported classes are: java.lang.String, java.lang.Long, 
+#   java.lang.Integer, java.lang.Float, java.lang.Double
+
+# height of tree (1+)
+h=java.lang.Integer:3
+# minimum number of children per node (> 0)
+min=java.lang.Integer:3
+# maximum number of children per node (>= min)
+max=java.lang.Integer:5
+
+
+
+# random graph section, mandatory, at most ONCE per file
+# ======================================================
+# can be used INSTEAD of the graph section
+# (only ONE graph XOR random graph section per file)
+
+[graph.random]
+
+# name of graph generator class
+
+teachnet.util.RandomRingGenerator
+
+# generator parameters in the form <name>=<class name>:<value>
+# supported classes are: java.lang.String, java.lang.Long, 
+#   java.lang.Integer, java.lang.Float, java.lang.Double
+
+# number of nodes in graph
+n=java.lang.Integer:10
+
+
+
+# network section, mandatory, at most ONCE per file
+# =================================================
+# configures the network behaviour (e.g. message delay)
+
+[network]
+
+# class name of network implementation to use
+# must extend teachnet.Network
+# (the only useful existing one currently is the one below,
+# creates linear random message delay between min and max values)
+
+teachnet.network.LinearDelayNetwork
+
+# network parameters in the form <name>=<class name>:<value>
+# supported classes are: java.lang.String, java.lang.Long, 
+#   java.lang.Integer, java.lang.Float, java.lang.Double
+
+# minimum message delay (in seconds)
+delay.min=java.lang.Double:1.0
+# maximum message delay (in seconds)
+delay.max=java.lang.Double:2.0
+
+
+
+# algorithm section, mandatory, at most ONCE per file
+# ===================================================
+# names the algorithm implemetation classes for the simulation
+
+[stack.algorithms]
+
+# list of algorithms to push onto protocol stack (for all nodes)
+# first algorithm is at bottom of stack
+# must list at least one class
+
+teachnet.examples.linkstate.LinkStateAlgorithm
+teachnet.examples.linkstate.ClientLayer
+
+
+
+# algorithm config section, optional
+# ==================================
+# lists parameters to be passed to the algorithm
+# before the simulation starts (via the setup method)
+
+[stack.configs]
+
+# algorithm parameters in the form <layer>.<name>=<class name>:<value>
+# layer is zero for bottom of protocol stack
+# supported classes are: java.lang.String, java.lang.Long, 
+#   java.lang.Integer, java.lang.Float, java.lang.Double
+
+# special value "$node.id", causes this parameter to be initialized
+# with an unique node id (as an Integer)
+0.node.id=java.lang.String:$node.id
+
+# special value "$network.size", causes this parameter to be initialized
+# with the number of nodes in the graph (as an Integer)
+0.network.size=java.lang.String:$network.size
+
+# example, result will be:
+# the map passed to the setup method of all nodes of layer 1
+# will contain the value 3.14 of type Double under the key "myparam"
+1.myparam=java.lang.Double:3.14
+
+
+
+# initiation section, optional
+# ============================
+# (but simulation will do nothing, without at least one line here)
+# each line contains a comma separated list of three values
+# 1. node id (can be "*" which means "all nodes")
+# 2. layer id
+# 3. simulation time at which to initialise (double precision value)
+
+[inits]
+
+# initialise layer 0 of all nodes at the start of the simulation
+*,0,0.0
+
+# initialise layer 1 of node 0 at 10 seconds simulation time
+0,1,10.0
+
+ 

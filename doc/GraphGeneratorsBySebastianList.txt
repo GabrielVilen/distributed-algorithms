@@ -1,0 +1,60 @@
+### Voll vermaschter Graph ###
+FullyMeshedGraphGenerator
+
+conf:
+[graph.random]
+teachnet.util.FullyMeshedGraphGenerator
+n=java.lang.Integer:5
+
+interfaces:
+Die Interface-Nummern entprechen den ID's der Zielknoten. D.h., dass jeder Knoten kein Interface mit der eignen ID besitzt!
+
+### Hypercube ###
+HypercubeGenerator
+
+conf:
+[graph.random]
+teachnet.util.HypercubeGenerator
+d=java.lang.Integer:3
+
+interfaces:
+Jeder Knoten besitzt die Interfaces 0..d-1
+Die Interfaces besitzen die Nummer der Dimension, in der der Zielknoten zu erreichen ist.
+Um also von Knoten 0010 zu 0110 zu kommen, muss Interface 2 benutzt werden.
+                    ^ Hier ist das differente Bit.
+
+### Grid ###
+GridGenerator
+Gitter x * y
+
+conf:
+[graph.random]
+teachnet.util.GridGenerator
+y=java.lang.Integer:3
+y=java.lang.Integer:5
+
+interfaces:
+Jeder Knoten beitzt 2..4 Interfaces, die wie folgt nummeriert sind:
+0 - Norden
+1 - Osten
+2 - Süden
+3 - Westen
+Achtung: Technet stellt den Graphen i.d.R. nicht genordet dar. Das ist aber nur eine visuelle Sache.. ;-)
+
+### quadratisches Grid ###
+SquareGridGenerator
+Gitter l * l
+
+conf:
+[graph.random]
+teachnet.util.SquareGridGenerator
+l=java.lang.Integer:5
+
+interfaces:
+Siehe Grid.
+
+### Lizenz ###
+
+CC BY-NC-SA 3.0
+Attribution-NonCommercial-ShareAlike 3.0
+Namensnennung-Nicht-kommerziell-Weitergabe unter gleichen Bedingungen
