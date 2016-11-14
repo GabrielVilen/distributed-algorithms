@@ -3,9 +3,11 @@ import teachnet.algorithm.BasicAlgorithm;
 import java.awt.Color;
 import java.util.Random;
 
-public class FloodingAck extends BasicAlgorithm
+public class Echo extends BasicAlgorithm
 {
 	final static int uninitialized = -1;
+	final static int greenColor = 65280;
+	final static int redColor = 16711680;
 	
 	Color color = null;
 	int markInterface = uninitialized;
@@ -37,7 +39,7 @@ public class FloodingAck extends BasicAlgorithm
 	private void confirmInformedBy() {
 		//node informed by node informedBy, send ack on that interface
 		color = Color.green;
-		send(this.informedBy, new TextMessage("ACK"));
+		send(this.informedBy, new TextMessage("ECHO"));
 	}
 	
 	public void receive(int interf, Object message)
@@ -55,26 +57,18 @@ public class FloodingAck extends BasicAlgorithm
 					}
 					color = Color.red;
 					this.informedBy = interf;
-					
-					if (checkInterfaces() == 1){
-						confirmInformedBy();
-					}
-					
-				} else {					
-					//it will send confirmation to activator immedietaly since it has only one interface
-					color = color = Color.green;
-					send(interf, new TextMessage("ACK"));
-				}
-			}else if (text.equals("ACK")){
-				count++;
-				if ((this.informedBy != this.id) && (count == checkInterfaces()-1)) {
-					// it is not an initiator node and cound=#neighbors-1
+				} 
+			}	
+			count++;
+			if (count == checkInterfaces()) {
+				if (this.informedBy != this.id) {
+					// it is not an initiator node
 					confirmInformedBy();
-				} else if ((this.informedBy == this.id) && (count == checkInterfaces())){
-					// it i initiator and cound=#neighbors, exit!
+				} else {
+					// it is initiator
 					color = Color.green;
 				}
-			}				
+			} 
 		}
 	}
 }
