@@ -31,4 +31,5 @@ FloodingAck
 0.node.id=java.lang.String:$node.id
 
 [inits]
+#*,0,0.0
 0,0,0.0

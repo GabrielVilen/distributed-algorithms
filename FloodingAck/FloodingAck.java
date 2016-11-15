@@ -16,7 +16,6 @@ public class FloodingAck extends BasicAlgorithm
 	// informedBy stores ID of node which send an explorer. 
 	// [-1] means not informed. [id] means that node is initiator
 	private int informedBy = uninitialized;
-	private boolean initiator = false;
 	private int id;
 	
 	public void setup(java.util.Map<String, Object> config)
@@ -32,7 +31,7 @@ public class FloodingAck extends BasicAlgorithm
 		for (int i = 0; i < checkInterfaces(); i++) {
 			send(i, new TextMessage("EXPLORER"));
 		}
-		this.initiator = true;
+		this.informedBy = this.id;
 	}
 	
 	private void confirmInformedBy() {
@@ -63,18 +62,16 @@ public class FloodingAck extends BasicAlgorithm
 					
 				} else {					
 					//it will send confirmation to activator immedietaly since it has only one interface
-					color = Color.green;
+					color = color = Color.green;
 					send(interf, new TextMessage("ACK"));
 				}
 			}else if (text.equals("ACK")){
 				count++;
-				if ((!this.initiator) && (count == checkInterfaces()-1)) {
+				if ((this.informedBy != this.id) && (count == checkInterfaces()-1)) {
 					// it is not an initiator node and cound=#neighbors-1
-					System.out.println("NODE "+caption+" RECEIVED COUNT "+count);
 					confirmInformedBy();
-				} else if (this.initiator && (count == checkInterfaces())){
+				} else if ((this.informedBy == this.id) && (count == checkInterfaces())){
 					// it i initiator and cound=#neighbors, exit!
-					System.out.println("NODE "+caption+" RECEIVED COUNT "+count);
 					color = Color.green;
 				}
 			}				
