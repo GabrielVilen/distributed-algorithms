@@ -11,6 +11,11 @@ java -jar $tn_path \
 --config EchoRingconfig.txt \
 --compile
 
+java -jar $tn_path \
+--cp . \
+--config EchoCubeconfig.txt \
+--compile
+
 javac -cp ../teachnet.jar Echo.java
 #java -cp .:../teachnet.jar teachnet/view/TeachnetFrame
 

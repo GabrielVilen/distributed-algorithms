@@ -18,6 +18,7 @@ public class Echo extends BasicAlgorithm
 	// informedBy stores ID of node which send an explorer. 
 	// [-1] means not informed. [id] means that node is initiator
 	private int informedBy = uninitialized;
+	private boolean initiator = false;
 	private int id;
 	
 	public void setup(java.util.Map<String, Object> config)
@@ -33,7 +34,7 @@ public class Echo extends BasicAlgorithm
 		for (int i = 0; i < checkInterfaces(); i++) {
 			send(i, new TextMessage("EXPLORER"));
 		}
-		this.informedBy = this.id;
+		this.initiator = true;
 	}
 	
 	private void confirmInformedBy() {
@@ -61,7 +62,7 @@ public class Echo extends BasicAlgorithm
 			}	
 			count++;
 			if (count == checkInterfaces()) {
-				if (this.informedBy != this.id) {
+				if (!this.initiator) {
 					// it is not an initiator node
 					confirmInformedBy();
 				} else {
