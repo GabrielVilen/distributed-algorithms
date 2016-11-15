@@ -11,11 +11,6 @@ java -jar $tn_path \
 --config FloodingAckconfig.txt \
 --compile
 
-java -jar $tn_path \
---cp . \
---config FloodingAckCubeconfig.txt \
---compile
-
 javac -cp ../teachnet.jar FloodingAck.java
 #java -cp .:../teachnet.jar teachnet/view/TeachnetFrame
 
