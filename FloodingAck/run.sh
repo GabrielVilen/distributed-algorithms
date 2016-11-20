@@ -1,5 +1,5 @@
 #!/bin/bash
-source teachnet.path
+source ../teachnet.path
 
 java -jar $tn_path \
 --cp . \
@@ -16,7 +16,7 @@ java -jar $tn_path \
 --config FloodingAckCubeconfig.txt \
 --compile
 
-javac -cp ../teachnet.jar FloodingAck.java
+javac -cp $tn_path FloodingAck.java
 #java -cp .:../teachnet.jar teachnet/view/TeachnetFrame
 
 # Windows Users use 
