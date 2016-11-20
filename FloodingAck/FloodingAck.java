@@ -3,6 +3,28 @@ import teachnet.algorithm.BasicAlgorithm;
 import java.awt.Color;
 import java.util.Random;
 
+/**
+ * Distributed Algorithms 
+ * 
+ * Homework 1
+ *  
+ * Group G10
+ * 
+ * Piotr Mrowczynski 387521 
+ * Gabriel Vilén 387555 
+ * Stefan Stojkovski 387529 
+ * Tong Li 387568
+ * 
+ * This class contains the implementation of the Flooding with acknowledgment algorithm. 
+ * 
+ * The algorithm works as following:
+ * 	- The initiator node sends explorer messages to all its neighbors  
+ * 	- A node acks an explorer with a confirmation as soon as it has recieved a confirmation for
+ * 	  all explorer send by itself
+ *  - The algorithm terminates if the initiator recieved a confirmation from every neighbor
+ *
+ * 
+ */
 public class FloodingAck extends BasicAlgorithm
 {
 	final static int uninitialized = -1;
@@ -13,10 +35,8 @@ public class FloodingAck extends BasicAlgorithm
 	int count = 0;
 	Random rand = null;
 	
-	// informedBy stores ID of node which send an explorer. 
-	// [-1] means not informed. [id] means that node is initiator
-	private int informedBy = uninitialized;
-	private boolean initiator = false;
+	private int activator = uninitialized;  // stores the ID of the node which send an explorer, uninitialized means not informed.
+	private boolean isInitiator = false;
 	private int id;
 	
 	public void setup(java.util.Map<String, Object> config)
@@ -27,18 +47,21 @@ public class FloodingAck extends BasicAlgorithm
 		color = Color.gray;
 	}
 	
+
+	// Only executed by initiator node
 	public void initiate()
 	{
 		for (int i = 0; i < checkInterfaces(); i++) {
 			send(i, new TextMessage("EXPLORER"));
 		}
-		this.initiator = true;
+		this.isInitiator = true;
 	}
 	
-	private void confirmInformedBy() {
-		//node informed by node informedBy, send ack on that interface
+
+	// Sends an ack to this node's activator node, activator
+	private void sendAckToActivator() {
 		color = Color.green;
-		send(this.informedBy, new TextMessage("ACK"));
+		send(this.activator, new TextMessage("ACK"));
 	}
 	
 	public void receive(int interf, Object message)
@@ -48,32 +71,33 @@ public class FloodingAck extends BasicAlgorithm
 			String text =  msg.getMessage();
 			
 			if(text.equals("EXPLORER")){
-				if (this.informedBy == uninitialized) {
-					//send explorer to all interfaces except an activator
+				if (this.activator == uninitialized) {
+					// Send explorer to all interfaces except activator
 					for (int i = 0; i < checkInterfaces(); i++) {
 						if (i != interf)
 							send(i, new TextMessage("EXPLORER"));
 					}
 					color = Color.red;
-					this.informedBy = interf;
+					this.activator = interf;
 					
+					// Node is leaf
 					if (checkInterfaces() == 1){
-						confirmInformedBy();
+						sendAckToActivator();
 					}
 					
 				} else {					
-					//it will send confirmation to activator immedietaly since it has only one interface
+					// Node will send confirmation to activator immedietaly since it has only one link
 					color = Color.green;
 					send(interf, new TextMessage("ACK"));
 				}
 			}else if (text.equals("ACK")){
 				count++;
-				if ((!this.initiator) && (count == checkInterfaces()-1)) {
-					// it is not an initiator node and cound=#neighbors-1
+				if ((!this.isInitiator) && (count == checkInterfaces()-1)) {
+					// Node is not initiator and cound=#neighbors-1
 					System.out.println("NODE "+caption+" RECEIVED COUNT "+count);
-					confirmInformedBy();
-				} else if (this.initiator && (count == checkInterfaces())){
-					// it i initiator and cound=#neighbors, exit!
+					sendAckToActivator();
+				} else if (this.isInitiator && (count == checkInterfaces())){
+					// Node is initiator and cound=#neighbors, exit!
 					System.out.println("NODE "+caption+" RECEIVED COUNT "+count);
 					color = Color.green;
 				}
