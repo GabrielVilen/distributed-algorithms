@@ -37,7 +37,7 @@ public class ChangRoberts extends BasicAlgorithm {
     // Only executed by initiator node
     public void initiate() {
     	isParticipant = true;
-    	sendToNeighbour(-1, new ElectionMessage(id, false)); // send this node's id to clockwise neighbor
+    	sendToNeighbour(0, new ElectionMessage(id, false)); // send this node's id to clockwise neighbor
     }
 
     // sends message to clockwise neighbour
