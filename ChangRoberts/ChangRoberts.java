@@ -11,7 +11,7 @@ import java.util.Random;
  * Group G10
  * 
  * Piotr Mrowczynski 387521
- * Gabriel Vilén 387555
+ * Gabriel Vilen 387555
  * Stefan Stojkovski 387529
  * Tong Li 387568
  * 
@@ -22,8 +22,6 @@ import java.util.Random;
  * 
  */
 public class ChangRoberts extends BasicAlgorithm {
-	private final static int GREEN = 65280, RED = 16711680;
-
 	Color color;
 	String caption;
 
@@ -51,37 +49,31 @@ public class ChangRoberts extends BasicAlgorithm {
 		isParticipant = true;
 	}
 
-	public void receive(int interf, Object message) {
-		if (message instanceof ElectionMessage) {
+	public void receive(int interf, Object msg) {
+		if (msg instanceof ElectionMessage) {
+			ElectionMessage message = (ElectionMessage) msg;
 			int cmpId = message.id;
 
-			switch (cmpId) {
-			case cmpId > id:
+			if (cmpId > id) {
 
 				sendToNeighbour(interf, message); // forwards msg to neighbour
-				break;
-
-			case cmpId < id && !isParticipant:
+			} else if (cmpId < id && !isParticipant) {
 
 				message.id = id; 	// updates msg id to this larger id
 				sendToNeighbour(interf, message);
-				break;
-
-			case cmpId == id:
-
+			} else if (cmpId == id) {
 				isLeader = true; 	// elect this node as leader
 				isParticipant = false;
 				sendToNeighbour(id, new ElectedMessage(id));
-				break;
 			}
-		} else if (message instanceof ElectedMessage) { // second round, check for elected msg
+		} else if (msg instanceof ElectedMessage) { // second round, check for elected msg
+			ElectedMessage message = (ElectedMessage) msg;
 			isParticipant = false;
 			electedId = message.id;
-			sendToNeighbour(intef, message);
+			sendToNeighbour(interf, message);
 
 			if (isLeader) { 		// leader recieve his own elected-msg, election is over
-				color = GREEN;
-				exit();
+				color = color.green;
 			}
 
 		}
