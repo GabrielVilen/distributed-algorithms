@@ -1,0 +1,21 @@
+FLOODING:
+
+I: {NOT informed} // Executed by Initiator SEND Explorer TO all Neighbors;
+  informed := TRUE;
+  
+{Explorer from neighbor N is received} 
+  IF NOT informed THEN
+		SEND Explorer TO all Neighbors except N; 
+ 		informed := TRUE;
+  		A := N; 
+  ELSE SEND
+  		Confirmation TO N; 
+  FI
+  
+{Confirmation is received} 
+ Count := Count + 1; 
+ IF (NOT Initiator) AND (Count == #Neighbors – 1) THEN 
+ 		SEND Confirmation TO Neighbor A; 
+ FI 
+ IF Initiator AND (Count == #Neighbors) THEN 
+ 		Exit; // Algorithm is terminated. FI
