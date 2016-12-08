@@ -36,7 +36,8 @@ public class ChangRoberts extends BasicAlgorithm {
 
     // Only executed by initiator node
     public void initiate() {
-    	sendToNeighbour(id, new ElectionMessage(id, false)); // send this node's id to clockwise neighbor
+    	isParticipant = true;
+    	sendToNeighbour(-1, new ElectionMessage(id, false)); // send this node's id to clockwise neighbor
     }
 
     // sends message to clockwise neighbour
@@ -52,23 +53,25 @@ public class ChangRoberts extends BasicAlgorithm {
 
             if (cmpId > id) {
                 sendToNeighbour(interf, message); // forwards msg to neighbour
-            } else if (cmpId < id) {
-                message.id = id;    // updates msg id to this larger id
-                sendToNeighbour(interf, message);
-            } else {
+            } else if (cmpId == id){
                 color = Color.blue;
                 electedId = id;
                 sendToNeighbour(interf, new ElectionMessage(id, true));
+            } else if (cmpId < id && !isParticipant) {
+				System.out.println("I have larger!" + id);
+                message.id = id;    // updates msg id to this larger id
+                sendToNeighbour(interf, message);
+            } else {
+				System.out.println("EXIT" + message.id);
             }
+            isParticipant = true;
         } else { // second round, check for elected msg
-        	if (electedId == message.id){
-        		return;
-        	}
             electedId = message.id;
-            System.out.println(electedId +" " + message.id);
             caption = "" + this.id + " elected: " + electedId;
-            color = Color.green;
-            sendToNeighbour(interf, message);
+        	if (id != message.id){
+                color = Color.green;
+                sendToNeighbour(interf, message);
+        	} 
         }
     }
 }

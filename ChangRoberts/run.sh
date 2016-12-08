@@ -11,6 +11,11 @@ java -jar $tn_path \
 --config ChangRobertsWorst.txt \
 --compile
 
+# java -jar $tn_path \
+# --cp . \
+# --config ChangRobertsWorst.txt \
+# --compile
+
 javac -cp $tn_path ChangRoberts.java
 #java -cp .:../teachnet.jar teachnet/view/TeachnetFrame
 
