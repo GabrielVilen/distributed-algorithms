@@ -1,9 +1,14 @@
 #!/bin/bash
 source ../teachnet.path
 
+# java -jar $tn_path \
+# --cp . \
+# --config ChangRobertsConfig.txt \
+# --compile
+
 java -jar $tn_path \
 --cp . \
---config ChangRobertsConfig.txt \
+--config ChangRobertsWorst.txt \
 --compile
 
 javac -cp $tn_path ChangRoberts.java
