@@ -25,7 +25,7 @@ public class ChangRoberts extends BasicAlgorithm {
 
     private Random rand;
     private boolean isParticipant = false, isLeader = false;
-    private int id, electedId;
+    private int id, electedId=0;
 
     public void setup(java.util.Map<String, Object> config) {
         this.id = (Integer) config.get("node.id");
@@ -36,51 +36,39 @@ public class ChangRoberts extends BasicAlgorithm {
 
     // Only executed by initiator node
     public void initiate() {
-        sendToNeighbour(id, new ElectionMessage(id)); // send this node's id to clockwise neighbor
-        isParticipant = true;
+    	sendToNeighbour(id, new ElectionMessage(id, false)); // send this node's id to clockwise neighbor
     }
 
     // sends message to clockwise neighbour
-    private void sendToNeighbour(int interf, Object message) {
-        color = Color.red;
-        int reciever = interf + 1 % checkInterfaces();
-        System.out.println("Seinding " + message + " to " + reciever);
+    private void sendToNeighbour(int interf, ElectionMessage message) {
+        int reciever = (interf + 1) % checkInterfaces();
         send(reciever, message);
-        isParticipant = true;
     }
-
+        
     public void receive(int interf, Object msg) {
-        if (msg instanceof ElectionMessage) {
-            ElectionMessage message = (ElectionMessage) msg;
+        ElectionMessage message = (ElectionMessage) msg;
+        if (!message.isElected) {
             int cmpId = message.id;
 
             if (cmpId > id) {
                 sendToNeighbour(interf, message); // forwards msg to neighbour
-
-            } else if (cmpId < id && !isParticipant) {
+            } else if (cmpId < id) {
                 message.id = id;    // updates msg id to this larger id
                 sendToNeighbour(interf, message);
-
-            } else if (cmpId < id && isParticipant) {
-                return; // discard the message
-
-            } else if (cmpId == id) {
-                isLeader = true;    // elect this node as leader
-                isParticipant = false;
-                sendToNeighbour(id, new ElectedMessage(id));
+            } else {
+                color = Color.blue;
+                electedId = id;
+                sendToNeighbour(interf, new ElectionMessage(id, true));
             }
-
-        } else if (msg instanceof ElectedMessage) { // second round, check for elected msg
-            ElectedMessage message = (ElectedMessage) msg;
-            isParticipant = false;
+        } else { // second round, check for elected msg
+        	if (electedId == message.id){
+        		return;
+        	}
             electedId = message.id;
+            System.out.println(electedId +" " + message.id);
+            caption = "" + this.id + " elected: " + electedId;
+            color = Color.green;
             sendToNeighbour(interf, message);
-
-            if (isLeader) {        // leader recieve his own elected-msg, election is over
-                color = Color.green;
-                return;
-            }
-
         }
     }
 }
