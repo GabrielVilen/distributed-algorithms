@@ -13,9 +13,15 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+/**
+ * To run the example: download ActiveMQ from http://activemq.apache.org/activemq-5143-release.html
+ * and run it with apache-activemq-5.11.1\bin\> activemq start
+ * and change URL to yours.
+ * see guide: http://javahonk.com/activemq-hello-world/
+ */
 public class HelloActiveMQ {
 
-    private static final String URL = "tcp://Gabriel:61616";
+    private static final String URL = "tcp://Gabriel:61616"; // change to yours
 
     public static void main(String[] args) throws Exception {
         HelloWorldConsumer[] consumers = new HelloWorldConsumer[10];
