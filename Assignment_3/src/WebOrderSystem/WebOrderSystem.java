@@ -69,7 +69,7 @@ class Starter {
 
             testQueue(camelContext);
 
-            Thread.sleep(60000);
+            Thread.sleep(60000); // shut down after sleep
 
             camelContext.stop();
 
@@ -85,8 +85,9 @@ class Starter {
         for (int i = 0; i < 10; i++) {
             Order order = new Order();
             order.setFirstName("Alice_" + i);
+            order.setLastName("test_" + i);
             template.sendBody(QUEUE_1_URI, order);
-            System.out.println("Sent msg " + i);
+            System.out.println("Sent order: " + i);
         }
         template.stop();
     }
