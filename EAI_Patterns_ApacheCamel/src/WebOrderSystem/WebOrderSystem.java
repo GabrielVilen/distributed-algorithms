@@ -18,7 +18,7 @@ import org.apache.camel.impl.DefaultCamelContext;
  * <p>
  * Created by gabri on 2017-01-12.
  */
-class WebSystem implements Processor {
+class WebOrderSystem implements Processor {
 
     public void process(Exchange exchange) throws Exception {
         Message message = exchange.getIn();
@@ -52,7 +52,7 @@ class Starter {
 
     public static void main(String[] args) {
         try {
-            final WebSystem orderConsumer = new WebSystem();
+            final WebOrderSystem orderConsumer = new WebOrderSystem();
 
             // Create Camel Context
             DefaultCamelContext camelContext = new DefaultCamelContext();
@@ -71,7 +71,7 @@ class Starter {
 
             testQueue(camelContext);
 
-            Thread.sleep(60000); // shut down after sleep
+            System.in.read(); // wait till ENTER pressed
 
             camelContext.stop();
 
