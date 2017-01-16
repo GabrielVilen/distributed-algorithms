@@ -1,10 +1,11 @@
 package WebOrderSystem;
 
 import Order.Order;
-import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
+
+import org.apache.activemq.camel.component.ActiveMQComponent;
 
 /**
  * Uses Message Endpoint
@@ -55,9 +56,8 @@ class Starter {
             final WebOrderSystem orderConsumer = new WebOrderSystem();
 
             DefaultCamelContext camelContext = new DefaultCamelContext();
-            ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent(IN_ENDPOINT_URL);
-
-            camelContext.addComponent("activemq", activeMQComponent);
+             ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent(IN_ENDPOINT_URL);
+             camelContext.addComponent("activemq", activeMQComponent);
             camelContext.addRoutes(new RouteBuilder(camelContext) {
                 @Override
                 public void configure() throws Exception {
