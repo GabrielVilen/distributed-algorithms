@@ -1,6 +1,7 @@
 package WebOrderSystem;
 
 import Order.Order;
+import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -17,7 +18,7 @@ import org.apache.camel.impl.DefaultCamelContext;
  * <p>
  * Created by gabri on 2017-01-12.
  */
-class WebOrderSystem implements Processor {
+class WebSystem implements Processor {
 
     public void process(Exchange exchange) throws Exception {
         Message message = exchange.getIn();
@@ -45,24 +46,27 @@ class WebOrderSystem implements Processor {
  */
 class Starter {
 
-  //  private static final String IN_ENDPOINT_URL = "tcp://Gabriel:61616";
-    private static final String QUEUE_1_URI = "activemq:queue:myqueue1";
-    private static final String QUEUE_2_URI = "activemq:queue:myqueue2";
+    private static final String TCP_LOCALHOST_61616 = "tcp://localhost:61616";
+    private static final String WEB_NEW_ORDER = "activemq:queue:WEB_NEW_ORDER";
+    private static final String NEW_ORDER = "activemq:queue:NEW_ORDER";
 
     public static void main(String[] args) {
         try {
-            final WebOrderSystem orderConsumer = new WebOrderSystem();
+            final WebSystem orderConsumer = new WebSystem();
 
+            // Create Camel Context
             DefaultCamelContext camelContext = new DefaultCamelContext();
-    //         ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent(IN_ENDPOINT_URL);
-     //        camelContext.addComponent("activemq", activeMQComponent);
+            
+            // Connect localhost ActiveMQ which should be separate process apache-activemq-5.14.3/bin$ ./activemq console
+            ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent(TCP_LOCALHOST_61616);
+            camelContext.addComponent("activemq", activeMQComponent);
             camelContext.addRoutes(new RouteBuilder(camelContext) {
                 @Override
                 public void configure() throws Exception {
-                    from(QUEUE_1_URI).process(orderConsumer).to(QUEUE_2_URI); // creates point-to-point channel
+                    from(WEB_NEW_ORDER).process(orderConsumer).to(NEW_ORDER); // creates point-to-point channel
                 }
             });
-            camelContext.getEndpoint(QUEUE_1_URI).createConsumer(orderConsumer);
+            camelContext.getEndpoint(WEB_NEW_ORDER).createConsumer(orderConsumer);
             camelContext.start();
 
             testQueue(camelContext);
@@ -84,7 +88,7 @@ class Starter {
             Order order = new Order();
             order.setFirstName("Alice_" + i);
             order.setLastName("test_" + i);
-            template.sendBody(QUEUE_1_URI, order);
+            template.sendBody(WEB_NEW_ORDER, order);
             System.out.println("Sent order: " + i);
         }
         template.stop();
