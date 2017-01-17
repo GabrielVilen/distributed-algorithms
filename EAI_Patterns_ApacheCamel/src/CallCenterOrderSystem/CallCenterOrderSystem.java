@@ -52,7 +52,7 @@ public class CallCenterOrderSystem {
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(120000); // sleep 2 minutes = 120000ms before write to file
+                        Thread.sleep(10000); // sleep 2 minutes = 120000ms before write to file
                         writeFile();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -65,6 +65,8 @@ public class CallCenterOrderSystem {
     public void addOrder(Order order) {
         String ordStr = order.getFirstName() + ", " + order.getLastName() + ", " + order.getNumberOfSurfboards()
                 + ", " + order.getNumberOfSurfboards() + ", " + order.getCustomerID();
+        System.out.println("Got new order " + ordStr);
+
         toWrite.add(ordStr);
     }
 
@@ -89,7 +91,7 @@ public class CallCenterOrderSystem {
             camelContext.addRoutes(new RouteBuilder(camelContext) {
                 @Override
                 public void configure() throws Exception {
-                    fromF("file://" + FILE_PATH).to(NEW_ORDER); // create endpoint from file
+                    from("file:order-file?noop=true").to(NEW_ORDER); // create endpoint from file
                 }
             });
             camelContext.start();
