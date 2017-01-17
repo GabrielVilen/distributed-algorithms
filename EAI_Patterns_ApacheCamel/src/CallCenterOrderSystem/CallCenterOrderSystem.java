@@ -5,7 +5,6 @@ import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -13,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * uses Channel Adapter 
@@ -33,16 +33,52 @@ import java.util.List;
 public class CallCenterOrderSystem {
 
     private final Path file;
-    private List<String> lines = new ArrayList<>();
+    private List<String> toWrite = new ArrayList<>();
     private static final String FILE_PATH = "order-file.txt";
     private static final String TCP_LOCALHOST_61616 = "tcp://localhost:61616";
     private static final String CC_NEW_ORDER = "activemq:queue:CC_NEW_ORDER";
     private static final String NEW_ORDER = "activemq:queue:NEW_ORDER";
 
+
+    public CallCenterOrderSystem(String filepath) {
+        this.file = Paths.get(filepath);
+        runWriteThread();
+
+    }
+
+    private void runWriteThread() {
+        // creates new thread that writes to file
+        new Thread(new Runnable() {
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(120000); // sleep 2 minutes = 120000ms before write to file
+                        writeFile();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public void addOrder(Order order) {
+        String ordStr = order.getFirstName() + ", " + order.getLastName() + ", " + order.getNumberOfSurfboards()
+                + ", " + order.getNumberOfSurfboards() + ", " + order.getCustomerID();
+        toWrite.add(ordStr);
+    }
+
+    @SuppressWarnings("Since15")
+    private void writeFile() throws IOException {
+        Files.write(file.toAbsolutePath(), toWrite, Charset.forName("UTF-8")); // TODO: causes java.nio.file.AccessDeniedException:
+
+        System.out.println("Wrote " + toWrite + " to file " + file);
+    }
+
+
     public static void main(String[] args) {
         try {
-            final Path file = Paths.get(FILE_PATH);
-            final CallCenterOrderSystem orderConsumer = new CallCenterOrderSystem(file);
+            final CallCenterOrderSystem orderConsumer = new CallCenterOrderSystem(FILE_PATH);
 
             // Create Camel Context
             DefaultCamelContext camelContext = new DefaultCamelContext();
@@ -69,51 +105,27 @@ public class CallCenterOrderSystem {
         }
     }
 
-    private static void testSystem(CallCenterOrderSystem orderSystem) throws Exception {
+    private static void testSystem(final CallCenterOrderSystem orderSystem) throws Exception {
 
-        for (int i = 0; i < 10; i++) {
-            Order order = new Order();
-            order.setFirstName("Alice_" + i);
-            order.setLastName("test_" + i);
-            orderSystem.addOrder(order);
-        }
-    }
-
-
-    public CallCenterOrderSystem(Path file) {
-        this.file = file;
-
-        // creates new thread that writes to file
+        // generate random orders to the call center
         new Thread(new Runnable() {
+            @Override
             public void run() {
-                try {
-                    Thread.sleep(1000); // sleep 2 minutes = 120000ms before write to file
-                    writeFile();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                Random random = new Random();
+                while (true) {
+                    int rand = random.nextInt(10000);
+                    Order order = new Order();
+                    order.setFirstName("Alice_" + rand);
+                    order.setLastName("test_" + rand);
+                    orderSystem.addOrder(order);
+                    try {
+                        Thread.sleep(rand);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+
         }).start();
-    }
-
-    public void addOrder(Order order) {
-        String ordStr = order.getFirstName() + ", " + order.getLastName() + ", " + order.getNumberOfSurfboards()
-                + ", " + order.getNumberOfSurfboards() + ", " + order.getCustomerID();
-        lines.add(ordStr);
-    }
-
-    @SuppressWarnings("Since15")
-    private void writeFile() throws IOException {
-        System.out.println("Trying to write to file = " + file.toAbsolutePath());
-
-        Charset charset = Charset.forName("US-ASCII");
-        String s = "blablabla";
-        try (BufferedWriter writer = Files.newBufferedWriter(file.toAbsolutePath(), charset)) {
-            writer.write(s, 0, s.length());
-            System.out.println("Wrote line to file:  " + s);
-        } catch (IOException x) {
-            System.err.format("IOException: %s%n", x);
-        }
-        //   Files.write(file.toAbsolutePath(), lines, Charset.forName("UTF-8")); // TODO: causes java.nio.file.AccessDeniedException:
     }
 }
