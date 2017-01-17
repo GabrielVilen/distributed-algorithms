@@ -5,6 +5,7 @@ import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -32,7 +33,52 @@ import java.util.List;
 public class CallCenterOrderSystem {
 
     private final Path file;
-    private List<String> lines = new ArrayList<String>();
+    private List<String> lines = new ArrayList<>();
+    private static final String FILE_PATH = "order-file.txt";
+    private static final String TCP_LOCALHOST_61616 = "tcp://localhost:61616";
+    private static final String CC_NEW_ORDER = "activemq:queue:CC_NEW_ORDER";
+    private static final String NEW_ORDER = "activemq:queue:NEW_ORDER";
+
+    public static void main(String[] args) {
+        try {
+            final Path file = Paths.get(FILE_PATH);
+            final CallCenterOrderSystem orderConsumer = new CallCenterOrderSystem(file);
+
+            // Create Camel Context
+            DefaultCamelContext camelContext = new DefaultCamelContext();
+
+            // Connect localhost ActiveMQ which should be separate process apache-activemq-5.14.3/bin$ ./activemq console
+            ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent(TCP_LOCALHOST_61616);
+            camelContext.addComponent("activemq", activeMQComponent);
+            camelContext.addRoutes(new RouteBuilder(camelContext) {
+                @Override
+                public void configure() throws Exception {
+                    fromF("file://" + FILE_PATH).to(NEW_ORDER); // create endpoint from file
+                }
+            });
+            camelContext.start();
+
+            testSystem(orderConsumer);
+
+            System.in.read(); // wait till ENTER pressed
+
+            camelContext.stop();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void testSystem(CallCenterOrderSystem orderSystem) throws Exception {
+
+        for (int i = 0; i < 10; i++) {
+            Order order = new Order();
+            order.setFirstName("Alice_" + i);
+            order.setLastName("test_" + i);
+            orderSystem.addOrder(order);
+        }
+    }
+
 
     public CallCenterOrderSystem(Path file) {
         this.file = file;
@@ -58,67 +104,16 @@ public class CallCenterOrderSystem {
 
     @SuppressWarnings("Since15")
     private void writeFile() throws IOException {
-        Files.write(file, lines, Charset.forName("UTF-8")); // TODO: causes java.nio.file.AccessDeniedException:
-        System.out.println("Wrote line to file:  " + lines);
-    }
+        System.out.println("Trying to write to file = " + file.toAbsolutePath());
 
-}
-
-/**
- * To get started with Camel:
- * <p>
- * Create a CamelContext.
- * <p>
- * Optionally, configure components or endpoints.
- * <p>
- * Add whatever routing rules you wish using the DSL and RouteBuilder or using Xml Configuration.
- * <p>
- * Start the context.
- */
-class Starter {
-
-    private static final String FILE_PATH = "order-file.txt";
-    private static final String TCP_LOCALHOST_61616 = "tcp://localhost:61616";
-    private static final String CC_NEW_ORDER = "activemq:queue:CC_NEW_ORDER";
-    private static final String NEW_ORDER = "activemq:queue:NEW_ORDER";
-
-    public static void main(String[] args) {
-        try {
-            final Path file = Paths.get(FILE_PATH);
-            final CallCenterOrderSystem orderConsumer = new CallCenterOrderSystem(file);
-
-            // Create Camel Context
-            DefaultCamelContext camelContext = new DefaultCamelContext();
-
-            // Connect localhost ActiveMQ which should be separate process apache-activemq-5.14.3/bin$ ./activemq console
-            ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent(TCP_LOCALHOST_61616);
-            camelContext.addComponent("activemq", activeMQComponent);
-            camelContext.addRoutes(new RouteBuilder(camelContext) {
-                @Override
-                public void configure() throws Exception {
-                    fromF("file://" +  FILE_PATH).to(NEW_ORDER); // create endpoint from file
-                }
-            });
-            camelContext.start();
-
-            testSystem(orderConsumer);
-
-            System.in.read(); // wait till ENTER pressed
-
-            camelContext.stop();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        Charset charset = Charset.forName("US-ASCII");
+        String s = "blablabla";
+        try (BufferedWriter writer = Files.newBufferedWriter(file.toAbsolutePath(), charset)) {
+            writer.write(s, 0, s.length());
+            System.out.println("Wrote line to file:  " + s);
+        } catch (IOException x) {
+            System.err.format("IOException: %s%n", x);
         }
-    }
-
-    private static void testSystem(CallCenterOrderSystem orderSystem) throws Exception {
-
-        for (int i = 0; i < 10; i++) {
-            Order order = new Order();
-            order.setFirstName("Alice_" + i);
-            order.setLastName("test_" + i);
-            orderSystem.addOrder(order);
-        }
+        //   Files.write(file.toAbsolutePath(), lines, Charset.forName("UTF-8")); // TODO: causes java.nio.file.AccessDeniedException:
     }
 }
