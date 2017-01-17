@@ -20,35 +20,28 @@ import org.apache.camel.impl.DefaultCamelContext;
  */
 class WebOrderSystem implements Processor {
 
-    public void process(Exchange exchange) throws Exception {
-        Message message = exchange.getIn();
-        Order order = message.getBody(Order.class); // type conversion to Order.class
-
-        String ordStr = order.getFirstName() + ", " + order.getLastName() + ", " + order.getNumberOfSurfboards()
-                + ", " + order.getNumberOfDivingSuits() + ", " + order.getCustomerID();
-
-        message.setBody(ordStr);
-
-        System.out.println("Set message body to: " + message.getBody());
-    }
-}
-
-/**
- * To get started with Camel:
- * <p>
- * Create a CamelContext.
- * <p>
- * Optionally, configure components or endpoints.
- * <p>
- * Add whatever routing rules you wish using the DSL and RouteBuilder or using Xml Configuration.
- * <p>
- * Start the context.
- */
-class Starter {
-
     private static final String TCP_LOCALHOST_61616 = "tcp://localhost:61616";
     private static final String WEB_NEW_ORDER = "activemq:queue:WEB_NEW_ORDER";
     private static final String NEW_ORDER = "activemq:queue:NEW_ORDER";
+
+    /**
+     * The process method acts as the Message Translator from type Order to String
+     */
+    public void process(Exchange exchange) throws Exception {
+        Message message = exchange.getIn();
+        try {
+            Order order = message.getBody(Order.class); // type conversion to Order.class
+
+            String ordStr = order.getFirstName() + ", " + order.getLastName() + ", " + order.getNumberOfSurfboards()
+                    + ", " + order.getNumberOfDivingSuits() + ", " + order.getCustomerID();
+
+            message.setBody(ordStr);
+        } catch (TypeConversionException ex) {
+            System.err.println("Message type not Order " + ex.getMessage());
+        }
+
+        System.out.println("Set message body to: " + message.getBody());
+    }
 
     public static void main(String[] args) {
         try {
@@ -56,7 +49,7 @@ class Starter {
 
             // Create Camel Context
             DefaultCamelContext camelContext = new DefaultCamelContext();
-            
+
             // Connect localhost ActiveMQ which should be separate process apache-activemq-5.14.3/bin$ ./activemq console
             ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent(TCP_LOCALHOST_61616);
             camelContext.addComponent("activemq", activeMQComponent);
