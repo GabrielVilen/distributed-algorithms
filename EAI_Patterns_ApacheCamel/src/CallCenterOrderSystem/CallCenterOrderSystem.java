@@ -4,6 +4,7 @@ import Order.Order;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.TypeConversionException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
@@ -34,16 +35,15 @@ import java.util.Random;
  */
 public class CallCenterOrderSystem implements Processor {
 
-    private final Path file;
     private List<String> toWrite = new ArrayList<String>();
-    private static final String FILE_PATH = "order-file.txt";
+    private static final String FILE_PATH = "orders/order_";
     private static final String TCP_LOCALHOST_61616 = "tcp://localhost:61616";
     private static final String CC_NEW_ORDER = "activemq:queue:CC_NEW_ORDER";
     private static final String NEW_ORDER = "activemq:queue:NEW_ORDER";
+    private int ordNumber;
 
 
-    public CallCenterOrderSystem(String filepath) {
-        this.file = Paths.get(filepath);
+    public CallCenterOrderSystem() {
         runWriteThread();
 
     }
@@ -54,7 +54,7 @@ public class CallCenterOrderSystem implements Processor {
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(10000); // sleep 2 minutes = 120000ms before write to file
+                        Thread.sleep(120000); // sleep 2 minutes = 120000ms before write to file
                         writeFile();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -64,26 +64,56 @@ public class CallCenterOrderSystem implements Processor {
         }).start();
     }
 
-    public void addOrder(Order order) {
-        String ordStr = order.getFirstName() + ", " + order.getLastName() + ", " + order.getNumberOfSurfboards()
-                + ", " + order.getNumberOfSurfboards() + ", " + order.getCustomerID();
-        System.out.println("Got new order " + ordStr);
+    /**
+     * The process method acts as the Message Translator from type String to Order
+     */
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        try {
+            String[] parts = exchange.getIn().getBody(String.class).split(", ");
 
-        toWrite.add(ordStr);
+            Order order = new Order();
+            order.setCustomerID(parts[0]);
+            String[] name = parts[1].split(" ");
+
+            order.setFirstName(name[0]);
+            order.setLastName(name[1]);
+            order.setNumberOfDivingSuits(Integer.parseInt(parts[2]));
+            order.setNumberOfSurfboards(Integer.parseInt(parts[3].substring(0, 1)));
+
+            System.out.println("Set message body to: " + order.toString());
+            exchange.getIn().setBody(order);
+        } catch (TypeConversionException ex) {
+            System.err.println("Message type not Order " + ex.getMessage());
+        }
+
+    }
+
+    /**
+     * An order string consists of comma­separated entries formatted as "CustomerID,
+     *   Full   Name,   Number   of   ordered   surfboards,   Number   of   ordered
+     * diving suits" 
+     */
+    public void addOrder(int id, String fullName, int surfboards, int divingsuits) {
+        toWrite.add(id + ", " + fullName + ", " + surfboards + ", " + divingsuits);
     }
 
     @SuppressWarnings("Since15")
     private void writeFile() throws IOException {
-        Files.write(file.toAbsolutePath(), toWrite, Charset.forName("UTF-8")); // TODO: causes java.nio.file.AccessDeniedException:
+        Path file = Paths.get(FILE_PATH + ordNumber);
+        Files.write(file.toAbsolutePath(), toWrite, Charset.forName("UTF-8"));
 
         System.out.println("Wrote " + toWrite + " to file " + file);
-      //  toWrite.clear();
+
+        ordNumber++;
+        toWrite.clear();
+
     }
 
 
     public static void main(String[] args) {
         try {
-            final CallCenterOrderSystem orderConsumer = new CallCenterOrderSystem(FILE_PATH);
+            final CallCenterOrderSystem orderConsumer = new CallCenterOrderSystem();
 
             // Create Camel Context
             DefaultCamelContext camelContext = new DefaultCamelContext();
@@ -94,7 +124,11 @@ public class CallCenterOrderSystem implements Processor {
             camelContext.addRoutes(new RouteBuilder(camelContext) {
                 @Override
                 public void configure() throws Exception {
-                    from("file:order-file?delete=true").process(orderConsumer).to(NEW_ORDER); // create endpoint from file
+                    // send and delete files from directory
+                    from("file:orders?delete=true")
+                            .split(body().tokenize("\n"))
+                            .process(orderConsumer)
+                            .to(NEW_ORDER);
                 }
             });
             camelContext.start();
@@ -112,18 +146,18 @@ public class CallCenterOrderSystem implements Processor {
 
     private static void testSystem(final CallCenterOrderSystem orderSystem) throws Exception {
 
-        // generate random orders to the call center
+        // generate new orders to the call center
         new Thread(new Runnable() {
             public void run() {
+                int id = 0;
                 Random random = new Random();
                 while (true) {
-                    int rand = random.nextInt(10000);
-                    Order order = new Order();
-                    order.setFirstName("Alice_" + rand);
-                    order.setLastName("test_" + rand);
-                    orderSystem.addOrder(order);
+                    String fullName = "Alice Bobbson";
+                    int surfboards = random.nextInt(10);
+                    int divingsuits = random.nextInt(10);
+                    orderSystem.addOrder(id++, fullName, surfboards, divingsuits);
                     try {
-                        Thread.sleep(rand);
+                        Thread.sleep(30000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -133,9 +167,4 @@ public class CallCenterOrderSystem implements Processor {
         }).start();
     }
 
-    @Override
-    public void process(Exchange exchange) throws Exception {
-        System.out.println("exchange.getIn() = " + exchange.getIn());
-        toWrite.clear();
-    }
 }
