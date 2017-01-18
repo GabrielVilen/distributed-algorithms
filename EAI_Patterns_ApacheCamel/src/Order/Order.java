@@ -9,9 +9,9 @@ public class Order implements Serializable {
     private String CustomerID;
     private String FirstName;
     private String LastName;
-    private String OverallItems; // (Number of all items in order)
-    private String NumberOfDivingSuits;
-    private String NumberOfSurfboards;
+    private int OverallItems; // (Number of all items in order)
+    private int NumberOfDivingSuits;
+    private int NumberOfSurfboards;
     private String OrderID;
     private String Valid;
     private String validationResult;
@@ -56,27 +56,27 @@ public class Order implements Serializable {
         LastName = lastName;
     }
 
-    public String getOverallItems() {
+    public int getOverallItems() {
         return OverallItems;
     }
 
-    public void setOverallItems(String overallItems) {
+    public void setOverallItems(int overallItems) {
         OverallItems = overallItems;
     }
 
-    public String getNumberOfDivingSuits() {
+    public int getNumberOfDivingSuits() {
         return NumberOfDivingSuits;
     }
 
-    public void setNumberOfDivingSuits(String numberOfDivingSuits) {
+    public void setNumberOfDivingSuits(int numberOfDivingSuits) {
         NumberOfDivingSuits = numberOfDivingSuits;
     }
 
-    public String getNumberOfSurfboards() {
+    public int getNumberOfSurfboards() {
         return NumberOfSurfboards;
     }
 
-    public void setNumberOfSurfboards(String numberOfSurfboards) {
+    public void setNumberOfSurfboards(int numberOfSurfboards) {
         NumberOfSurfboards = numberOfSurfboards;
     }
 
