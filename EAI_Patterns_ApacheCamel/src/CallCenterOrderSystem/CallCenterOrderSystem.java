@@ -2,6 +2,8 @@ package CallCenterOrderSystem;
 
 import Order.Order;
 import org.apache.activemq.camel.component.ActiveMQComponent;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
@@ -30,7 +32,7 @@ import java.util.Random;
  * <p>
  * Created by gabri on 2017-01-12.
  */
-public class CallCenterOrderSystem {
+public class CallCenterOrderSystem implements Processor {
 
     private final Path file;
     private List<String> toWrite = new ArrayList<>();
@@ -75,6 +77,7 @@ public class CallCenterOrderSystem {
         Files.write(file.toAbsolutePath(), toWrite, Charset.forName("UTF-8")); // TODO: causes java.nio.file.AccessDeniedException:
 
         System.out.println("Wrote " + toWrite + " to file " + file);
+      //  toWrite.clear();
     }
 
 
@@ -91,7 +94,7 @@ public class CallCenterOrderSystem {
             camelContext.addRoutes(new RouteBuilder(camelContext) {
                 @Override
                 public void configure() throws Exception {
-                    from("file:order-file?noop=true").to(NEW_ORDER); // create endpoint from file
+                    from("file:order-file?delete=true").process(orderConsumer).to(NEW_ORDER); // create endpoint from file
                 }
             });
             camelContext.start();
@@ -129,5 +132,11 @@ public class CallCenterOrderSystem {
             }
 
         }).start();
+    }
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        System.out.println("exchange.getIn() = " + exchange.getIn());
+        toWrite.clear();
     }
 }
