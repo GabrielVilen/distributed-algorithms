@@ -33,7 +33,7 @@ import java.util.Random;
 public class CallCenterOrderSystem {
 
     private final Path file;
-    private List<String> toWrite = new ArrayList<>();
+    private List<String> toWrite = new ArrayList<String>();
     private static final String FILE_PATH = "order-file.txt";
     private static final String TCP_LOCALHOST_61616 = "tcp://localhost:61616";
     private static final String CC_NEW_ORDER = "activemq:queue:CC_NEW_ORDER";
@@ -109,7 +109,6 @@ public class CallCenterOrderSystem {
 
         // generate random orders to the call center
         new Thread(new Runnable() {
-            @Override
             public void run() {
                 Random random = new Random();
                 while (true) {

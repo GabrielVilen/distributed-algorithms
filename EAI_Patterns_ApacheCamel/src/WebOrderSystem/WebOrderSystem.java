@@ -1,6 +1,9 @@
 package WebOrderSystem;
 
 import Order.Order;
+
+import java.util.Random;
+
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
@@ -28,19 +31,26 @@ class WebOrderSystem implements Processor {
      * The process method acts as the Message Translator from type Order to String
      */
     public void process(Exchange exchange) throws Exception {
-        Message message = exchange.getIn();
         try {
-            Order order = message.getBody(Order.class); // type conversion to Order.class
+            String[] parts = exchange.getIn().getBody(String.class).split(",");
 
-            String ordStr = order.getFirstName() + ", " + order.getLastName() + ", " + order.getNumberOfSurfboards()
-                    + ", " + order.getNumberOfDivingSuits() + ", " + order.getCustomerID();
+            Order order = new Order();
+            order.setFirstName(parts[0]);
+            order.setLastName(parts[1]);
+            
+            int divingSuits = Integer.parseInt(parts[2]);
+            int surfboards = Integer.parseInt(parts[3]);
+            order.setOverallItems(divingSuits+surfboards);
+            order.setNumberOfDivingSuits(divingSuits);
+            order.setNumberOfSurfboards(surfboards);
+            order.setCustomerID(parts[4]);
 
-            message.setBody(ordStr);
+            System.out.println("Set message body to: " + order.toString());
+            exchange.getIn().setBody(order);
         } catch (TypeConversionException ex) {
             System.err.println("Message type not Order " + ex.getMessage());
         }
 
-        System.out.println("Set message body to: " + message.getBody());
     }
 
     public static void main(String[] args) {
@@ -76,13 +86,18 @@ class WebOrderSystem implements Processor {
     private static void testQueue(CamelContext camelContext) throws Exception {
 
         ProducerTemplate template = camelContext.createProducerTemplate();
+        Random rn = new Random();
 
         for (int i = 0; i < 10; i++) {
-            Order order = new Order();
-            order.setFirstName("Alice_" + i);
-            order.setLastName("test_" + i);
-            template.sendBody(WEB_NEW_ORDER, order);
-            System.out.println("Sent order: " + i);
+            int numberOfDivingSuits = rn.nextInt(10);
+            int numberOfSurfboards = rn.nextInt(10);
+            String customerID = Integer.toString(rn.nextInt(100));
+            
+            String ordStr = ("Alice_" + i) + "," + ("Surname_" + i) + "," + numberOfSurfboards
+            + "," + numberOfDivingSuits + "," + customerID;
+            
+            template.sendBody(WEB_NEW_ORDER, ordStr);
+            System.out.println("Sent order: " + ordStr);
         }
         template.stop();
     }
