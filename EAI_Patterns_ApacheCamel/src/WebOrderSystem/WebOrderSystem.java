@@ -69,7 +69,7 @@ class WebOrderSystem implements Processor {
                     from(WEB_NEW_ORDER).process(orderConsumer).to(NEW_ORDER); // creates point-to-point channel
                 }
             });
-            camelContext.getEndpoint(WEB_NEW_ORDER).createConsumer(orderConsumer);
+            //camelContext.getEndpoint(WEB_NEW_ORDER).createConsumer(orderConsumer);
             camelContext.start();
 
             testQueue(camelContext);

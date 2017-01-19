@@ -1,6 +1,7 @@
 package Order;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by gabri on 2017-01-12.
@@ -13,7 +14,7 @@ public class Order implements Serializable {
     private int NumberOfDivingSuits;
     private int NumberOfSurfboards;
     private String OrderID;
-    private String Valid;
+    private Boolean Valid;
     private String validationResult;
 
 
@@ -88,11 +89,11 @@ public class Order implements Serializable {
         OrderID = orderID;
     }
 
-    public String getValid() {
+    public Boolean getValid() {
         return Valid;
     }
 
-    public void setValid(String valid) {
+    public void setValid(Boolean valid) {
         Valid = valid;
     }
 
