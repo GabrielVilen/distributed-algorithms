@@ -31,7 +31,6 @@ import java.util.Random;
  * least   one   call   center   order   is   processed   during   presentation   of   the
  * exercise
  * <p>
- * Created by gabri on 2017-01-12.
  */
 public class CallCenterOrderSystem implements Processor {
 
@@ -42,19 +41,15 @@ public class CallCenterOrderSystem implements Processor {
     private static final String NEW_ORDER = "activemq:queue:NEW_ORDER";
     private int ordNumber;
 
-
+    /**
+     * Constructor that creates new thread that writes to file
+     */
     public CallCenterOrderSystem() {
-        runWriteThread();
-
-    }
-
-    private void runWriteThread() {
-        // creates new thread that writes to file
         new Thread(new Runnable() {
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(120000); // sleep 2 minutes = 120000ms before write to file
+                        Thread.sleep(3000); // sleep 2 minutes = 120000ms before write to file
                         writeFile();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -62,6 +57,7 @@ public class CallCenterOrderSystem implements Processor {
                 }
             }
         }).start();
+
     }
 
     /**
@@ -111,6 +107,9 @@ public class CallCenterOrderSystem implements Processor {
     }
 
 
+    /**
+     * Start Call center order system that reads from file and delete it
+     */
     public static void main(String[] args) {
         try {
             final CallCenterOrderSystem orderConsumer = new CallCenterOrderSystem();
@@ -144,6 +143,9 @@ public class CallCenterOrderSystem implements Processor {
         }
     }
 
+    /**
+     * Tests the system by putting random orders on its queue
+     */
     private static void testSystem(final CallCenterOrderSystem orderSystem) throws Exception {
 
         // generate new orders to the call center
@@ -157,7 +159,7 @@ public class CallCenterOrderSystem implements Processor {
                     int divingsuits = random.nextInt(10);
                     orderSystem.addOrder(id++, fullName, surfboards, divingsuits);
                     try {
-                        Thread.sleep(30000);
+                        Thread.sleep(1000); // 30000
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
