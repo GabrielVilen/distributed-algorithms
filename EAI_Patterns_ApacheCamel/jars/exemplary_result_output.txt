@@ -1,0 +1,39 @@
+Validated order: 
+Order{CustomerID='78', FirstName='Alice', LastName='Bobbson', OverallItems='4', NumberOfDivingSuits='4', NumberOfSurfboards='0', OrderID='eff23946-5cc1-42e4-a248-c660f2eb3f06', Valid='true', validationResult='[]'}
+
+
+Invalid order: 
+Order{CustomerID='79', FirstName='Alice', LastName='Bobbson', OverallItems='9', NumberOfDivingSuits='7', NumberOfSurfboards='2', OrderID='a46d1a2e-81bd-432e-8fc3-91d4b6df99fb', Valid='false', validationResult='[Not enough money. Required: 1600, Not enought items available in DivingSuit. Available: 1, Required: 7]'}
+
+
+Invalid order: 
+Order{CustomerID='80', FirstName='Alice', LastName='Bobbson', OverallItems='18', NumberOfDivingSuits='9', NumberOfSurfboards='9', OrderID='5d1360ec-7dfb-45dc-a202-ab3ca26f1a34', Valid='false', validationResult='[Not enought items available in Surfboard. Available: 4, Required: 9]'}
+
+
+Validated order: 
+Order{CustomerID='81', FirstName='Alice', LastName='Bobbson', OverallItems='11', NumberOfDivingSuits='4', NumberOfSurfboards='7', OrderID='ccab153a-7403-4e83-9569-f38c96e92f90', Valid='true', validationResult='[]'}
+
+
+Invalid order: 
+Order{CustomerID='82', FirstName='Alice', LastName='Bobbson', OverallItems='7', NumberOfDivingSuits='5', NumberOfSurfboards='2', OrderID='bc9485fd-8bbd-4ff6-a1a1-cce16ffb0957', Valid='false', validationResult='[Not enought items available in Surfboard. Available: 0, Required: 2]'}
+
+
+Invalid order: 
+Order{CustomerID='83', FirstName='Alice', LastName='Bobbson', OverallItems='11', NumberOfDivingSuits='6', NumberOfSurfboards='5', OrderID='2ac334d5-7beb-4e68-b75f-9634a41d77b7', Valid='false', validationResult='[Not enough money. Required: 1700, Not enought items available in Surfboard. Available: 0, Required: 5]'}
+
+
+Invalid order: 
+Order{CustomerID='84', FirstName='Alice', LastName='Bobbson', OverallItems='6', NumberOfDivingSuits='6', NumberOfSurfboards='0', OrderID='a133ff3b-14d7-42aa-b1d3-570d2fff8949', Valid='false', validationResult='[Not enought items available in DivingSuit. Available: 3, Required: 6]'}
+
+
+Invalid order: 
+Order{CustomerID='85', FirstName='Alice', LastName='Bobbson', OverallItems='17', NumberOfDivingSuits='8', NumberOfSurfboards='9', OrderID='17e11456-3fad-4b55-9d8b-455c38dee502', Valid='false', validationResult='[Not enough money. Required: 2500, Not enought items available in Surfboard. Available: 3, Required: 9]'}
+
+
+Invalid order: 
+Order{CustomerID='86', FirstName='Alice', LastName='Bobbson', OverallItems='18', NumberOfDivingSuits='9', NumberOfSurfboards='9', OrderID='405cc2ef-4d08-4dbe-afb8-ced80d19a5d4', Valid='false', validationResult='[Not enought items available in Surfboard. Available: 3, Required: 9]'}
+
+
+Validated order: 
+Order{CustomerID='87', FirstName='Alice', LastName='Bobbson', OverallItems='7', NumberOfDivingSuits='4', NumberOfSurfboards='3', OrderID='22772614-ab26-4d75-968f-8241fa01f39d', Valid='true', validationResult='[]'}
+
