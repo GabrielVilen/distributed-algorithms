@@ -74,8 +74,11 @@ public class CallCenterOrderSystem implements Processor {
 
             order.setFirstName(name[0]);
             order.setLastName(name[1]);
-            order.setNumberOfDivingSuits(Integer.parseInt(parts[2]));
-            order.setNumberOfSurfboards(Integer.parseInt(parts[3].substring(0, 1)));
+            int divingSuits = Integer.parseInt(parts[2]);
+            int surfboards = Integer.parseInt(parts[3].substring(0, 1));
+            order.setNumberOfDivingSuits(divingSuits);
+            order.setNumberOfSurfboards(surfboards);
+            order.setOverallItems(divingSuits + surfboards);
 
             System.out.println("Set message body to: " + order.toString());
             exchange.getIn().setBody(order);
