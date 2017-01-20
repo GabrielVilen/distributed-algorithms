@@ -1,10 +1,20 @@
 package Order;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
- * Created by gabri on 2017-01-12.
+ * The   result   of   the   order   application   integration   is   a   common/transformed
+ * format for orders. Each order consists of following properties (type String):
+ * ◦ CustomerID
+ * ◦ FirstName
+ * ◦ LastName
+ * ◦ OverallItems (Number of all items in order)
+ * ◦ NumberOfDivingSuits
+ * ◦ NumberOfSurfboards
+ * ◦ OrderID
+ * ◦ Valid
+ * ◦ validationResult
+ * <p>
  */
 public class Order implements Serializable {
     private String CustomerID;

@@ -1,13 +1,12 @@
 package WebOrderSystem;
 
 import Order.Order;
-
-import java.util.Random;
-
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
+
+import java.util.Random;
 
 /**
  * Uses Message Endpoint
@@ -19,7 +18,6 @@ import org.apache.camel.impl.DefaultCamelContext;
  * surfboards, Number of ordered diving suits, Customer­ID> ­ e.g.: Alice,
  * Test, 2, 0, 1
  * <p>
- * Created by gabri on 2017-01-12.
  */
 class WebOrderSystem implements Processor {
 
@@ -37,10 +35,10 @@ class WebOrderSystem implements Processor {
             Order order = new Order();
             order.setFirstName(parts[0]);
             order.setLastName(parts[1]);
-            
+
             int divingSuits = Integer.parseInt(parts[2]);
             int surfboards = Integer.parseInt(parts[3]);
-            order.setOverallItems(divingSuits+surfboards);
+            order.setOverallItems(divingSuits + surfboards);
             order.setNumberOfDivingSuits(divingSuits);
             order.setNumberOfSurfboards(surfboards);
             order.setCustomerID(parts[4]);
@@ -53,6 +51,9 @@ class WebOrderSystem implements Processor {
 
     }
 
+    /**
+     * Starts the web order system
+     */
     public static void main(String[] args) {
         try {
             final WebOrderSystem orderConsumer = new WebOrderSystem();
@@ -83,6 +84,9 @@ class WebOrderSystem implements Processor {
         }
     }
 
+    /**
+     * Tests the queue by adding random orders
+     */
     private static void testQueue(CamelContext camelContext) throws Exception {
 
         ProducerTemplate template = camelContext.createProducerTemplate();
@@ -92,10 +96,10 @@ class WebOrderSystem implements Processor {
             int numberOfDivingSuits = rn.nextInt(10);
             int numberOfSurfboards = rn.nextInt(10);
             String customerID = Integer.toString(rn.nextInt(100));
-            
+
             String ordStr = ("Alice_" + i) + "," + ("Surname_" + i) + "," + numberOfSurfboards
-            + "," + numberOfDivingSuits + "," + customerID;
-            
+                    + "," + numberOfDivingSuits + "," + customerID;
+
             template.sendBody(WEB_NEW_ORDER, ordStr);
             System.out.println("Sent order: " + ordStr);
         }

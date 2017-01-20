@@ -2,6 +2,9 @@ package Order;
 
 import java.io.Serializable;
 
+/**
+ * Wrapper class for order
+ */
 public class OrderItem implements Serializable {
 	public String type; // type of the item
     public String orderID; // type of the item
